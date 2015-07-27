@@ -24,6 +24,18 @@ macro(APM_parentScope a_APM_Variable)
 	set(${a_APM_Variable} ${${a_APM_Variable}} PARENT_SCOPE)
 endmacro()
 
+#
+#macro(APM_GLOB_RECURSE_DIR result curdir)
+#  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+#  SET(dirlist "")
+#  FOREACH(child ${children})
+#    IF(IS_DIRECTORY ${curdir}/${child})
+ #       LIST(APPEND dirlist ${child})
+ #   ENDIF()
+#  ENDFOREACH()
+ # SET(${result} ${dirlist})
+#endmacro()
+
 
 function(APM_ExternalProject_Add a_APM_name a_APM_version)
 	# Managing arguments
@@ -34,26 +46,31 @@ function(APM_ExternalProject_Add a_APM_name a_APM_version)
 
 	set(l_APM_RootProjectDir "${APM_REPOSITORY_DIR}/${a_APM_name}/${a_APM_version}")
 	
-	set(APM_${a_APM_name}_${a_APM_version}_DOWNLOAD_DIR "${l_APM_RootProjectDir}/download" PARENT_SCOPE)
-	set(APM_${a_APM_name}_${a_APM_version}_SOURCE_DIR "${l_APM_RootProjectDir}/source" PARENT_SCOPE)
-	set(APM_${a_APM_name}_${a_APM_version}_INSTALL_DIR "${l_APM_RootProjectDir}/install/${APM_COMPILER_ID}" PARENT_SCOPE)
+	string(REPLACE "." "_" l_APM_underscore_version ${a_APM_version})
+	set(l_APM_BaseVariableName "APM_${a_APM_name}_${l_APM_underscore_version}")
 	
-	message(STATUS "${APM_${a_APM_name}_${a_APM_version}_DOWNLOAD_DIR} = ${l_APM_RootProjectDir}/download")
-	message(STATUS "${APM_${a_APM_name}_${a_APM_version}_SOURCE_DIR} = ${l_APM_RootProjectDir}/source")
-	message(STATUS "${APM_${a_APM_name}_${a_APM_version}_INSTALL_DIR} = ${l_APM_RootProjectDir}/install/${APM_COMPILER_ID}")
+	set("${l_APM_BaseVariableName}_DOWNLOAD_DIR" "${l_APM_RootProjectDir}/download")
+	set("${l_APM_BaseVariableName}_SOURCE_DIR" "${l_APM_RootProjectDir}/source" )
+	set("${l_APM_BaseVariableName}_INSTALL_DIR" "${l_APM_RootProjectDir}/install/${APM_COMPILER_ID}")
+	
 	ExternalProject_Add(
 		${a_APM_name}
-		DOWNLOAD_DIR "${APM_${a_APM_name}_${a_APM_version}_DOWNLOAD_DIR}"
-		SOURCE_DIR "${APM_${a_APM_name}_${a_APM_version}_SOURCE_DIR}"
+		DOWNLOAD_DIR ${${l_APM_BaseVariableName}_DOWNLOAD_DIR}
+		SOURCE_DIR ${${l_APM_BaseVariableName}_SOURCE_DIR}
 		STAMP_DIR ${l_APM_RootProjectDir}/stamps
 		TMP_DIR ${l_APM_RootProjectDir}/tmp
 		BINARY_DIR ${l_APM_RootProjectDir}/build/${APM_COMPILER_ID}
 		CMAKE_ARGS
 			${CMAKE_PROPAGATED_VARIABLES}
-			-DCMAKE_INSTALL_PREFIX:PATH="${APM_${a_APM_name}_${a_APM_version}_INSTALL_DIR}"
+			-DCMAKE_INSTALL_PREFIX:PATH=${${l_APM_BaseVariableName}_INSTALL_DIR}
 			-DBUILD_TESTING=1
 		${ARGV}
 	)
+	
+	#set useful variables in parent scope
+	set("${l_APM_BaseVariableName}_DOWNLOAD_DIR" "${${l_APM_BaseVariableName}_DOWNLOAD_DIR}" PARENT_SCOPE)
+	set("${l_APM_BaseVariableName}_SOURCE_DIR" "${${l_APM_BaseVariableName}_SOURCE_DIR}" PARENT_SCOPE)
+	set("${l_APM_BaseVariableName}_INSTALL_DIR" "${${l_APM_BaseVariableName}_INSTALL_DIR}" PARENT_SCOPE)
 endfunction()
 
 
@@ -143,7 +160,7 @@ function(APM_Repository_getProject a_APM_repo a_APM_projectName)
 			include("${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
 			APM_install(VERSION ${APM_require_VERSION})
 		else(EXISTS "${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
-			APM_message(STATUS "Merde alors... ${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
+		
 		endif(EXISTS "${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
 		
 	endif(${l_APM_repositoryType} MATCHES "FOLDER")
@@ -183,7 +200,9 @@ function(require a_APM_projectName)
 	set(l_APM_OneValueArguments VERSION REPOSITORY)
 	set(l_APM_MultipleValuesArguments TARGETS)
 	cmake_parse_arguments(APM_require "${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
+	
 	set(APM_QUIET ${APM_require_QUIET})
+	
 	if(NOT APM_require_REPOSITORY)
 		set(APM_REPOSITORY_DIR ${APM_DEFAULT_REPOSITORY_DIR})
 	else(NOT APM_require_REPOSITORY)
@@ -191,12 +210,50 @@ function(require a_APM_projectName)
 		set(APM_REPOSITORY_DIR ${l_APM_RepoLocation})
 	endif(NOT APM_require_REPOSITORY)
 	
+	set(l_APM_find_package_args)
+	
+	if(NOT APM_require_VERSION)
+		set(APM_require_VERSION )
+	else(NOT APM_require_VERSION)
+		list(APPEND l_APM_find_package_args ${APM_require_VERSION})
+	endif(NOT APM_require_VERSION)
+	
+	if(NOT APM_require_EXACT)
+		set(APM_require_EXACT )
+	else(NOT APM_require_EXACT)
+		list(APPEND l_APM_find_package_args EXACT)
+	endif(NOT APM_require_EXACT)
+	
+	if(NOT APM_require_OPTIONAL)
+		set(APM_require_OPTIONAL )
+	else(NOT APM_require_OPTIONAL)
+		list(APPEND l_APM_find_package_args OPTIONAL)
+	endif(NOT APM_require_OPTIONAL)
+	
+	
+	if(NOT APM_require_QUIET)
+		set(APM_require_QUIET )
+	else(NOT APM_require_QUIET)
+		list(APPEND l_APM_find_package_args QUIET)
+	endif(NOT APM_require_QUIET)
 	
 	APM_message(STATUS "Requiring project ${a_APM_projectName}")
-	# Each l_APM_repo contains the name of a repository variable
-	foreach(l_APM_repo ${APM_repositories})
-		APM_Repository_getProject(${l_APM_repo} ${a_APM_projectName})
-	endforeach(l_APM_repo)
+	
+	#search file Find${a_APM_projectName}.cmake in repository
+	file(GLOB_RECURSE l_APM_fileLocation RELATIVE ${APM_DEFAULT_REPOSITORY_DIR} "Find${a_APM_projectName}.cmake")
+	get_filename_component(l_APM_pathOfFindFile "${APM_DEFAULT_REPOSITORY_DIR}/${l_APM_fileLocation}" DIRECTORY)
+	
+	list(APPEND CMAKE_MODULE_PATH ${l_APM_pathOfFindFile})
+	find_package(${a_APM_projectName} ${l_APM_find_package_args} MODULE)
+	
+	if(${a_APM_projectName}_FOUND)
+		APM_message("Package ${a_APM_projectName} found...")
+	else(${a_APM_projectName}_FOUND)
+		# Each l_APM_repo contains the name of a repository variable
+		foreach(l_APM_repo ${APM_repositories})
+			APM_Repository_getProject(${l_APM_repo} ${a_APM_projectName})
+		endforeach(l_APM_repo)
+	endif(${a_APM_projectName}_FOUND)
 endfunction()
 
 

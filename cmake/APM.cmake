@@ -2,8 +2,15 @@ include(CMakeParseArguments)
 include(ExternalProject)
 
 set(APM_DEFAULT_REPOSITORY_DIR "C:/Developpements/APM/repo")
-function(APM_install)
-endfunction()
+if(MSVC)
+	if(CMAKE_CL_64)
+		set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-64bits-${CMAKE_CXX_COMPILER_VERSION}")
+	else(CMAKE_CL_64)
+		set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-32bits-${CMAKE_CXX_COMPILER_VERSION}")
+	endif(CMAKE_CL_64)
+else(MSVC)
+	set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
+endif(MSVC)
 
 #################################################
 #				APM utilities					#
@@ -16,6 +23,38 @@ endmacro()
 macro(APM_parentScope a_APM_Variable)
 	set(${a_APM_Variable} ${${a_APM_Variable}} PARENT_SCOPE)
 endmacro()
+
+
+function(APM_ExternalProject_Add a_APM_name a_APM_version)
+	# Managing arguments
+	set(l_APM_OptionArguments OPTIONAL REQUIRED QUIET EXACT)
+	set(l_APM_OneValueArguments VERSION)
+	set(l_APM_MultipleValuesArguments TARGETS)
+	cmake_parse_arguments(l_APM_install "${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
+
+	set(l_APM_RootProjectDir "${APM_REPOSITORY_DIR}/${a_APM_name}/${a_APM_version}")
+	
+	set(APM_${a_APM_name}_${a_APM_version}_DOWNLOAD_DIR "${l_APM_RootProjectDir}/download" PARENT_SCOPE)
+	set(APM_${a_APM_name}_${a_APM_version}_SOURCE_DIR "${l_APM_RootProjectDir}/source" PARENT_SCOPE)
+	set(APM_${a_APM_name}_${a_APM_version}_INSTALL_DIR "${l_APM_RootProjectDir}/install/${APM_COMPILER_ID}" PARENT_SCOPE)
+	
+	message(STATUS "${APM_${a_APM_name}_${a_APM_version}_DOWNLOAD_DIR} = ${l_APM_RootProjectDir}/download")
+	message(STATUS "${APM_${a_APM_name}_${a_APM_version}_SOURCE_DIR} = ${l_APM_RootProjectDir}/source")
+	message(STATUS "${APM_${a_APM_name}_${a_APM_version}_INSTALL_DIR} = ${l_APM_RootProjectDir}/install/${APM_COMPILER_ID}")
+	ExternalProject_Add(
+		${a_APM_name}
+		DOWNLOAD_DIR "${APM_${a_APM_name}_${a_APM_version}_DOWNLOAD_DIR}"
+		SOURCE_DIR "${APM_${a_APM_name}_${a_APM_version}_SOURCE_DIR}"
+		STAMP_DIR ${l_APM_RootProjectDir}/stamps
+		TMP_DIR ${l_APM_RootProjectDir}/tmp
+		BINARY_DIR ${l_APM_RootProjectDir}/build/${APM_COMPILER_ID}
+		CMAKE_ARGS
+			${CMAKE_PROPAGATED_VARIABLES}
+			-DCMAKE_INSTALL_PREFIX:PATH="${APM_${a_APM_name}_${a_APM_version}_INSTALL_DIR}"
+			-DBUILD_TESTING=1
+		${ARGV}
+	)
+endfunction()
 
 
 #################################################
@@ -102,7 +141,7 @@ function(APM_Repository_getProject a_APM_repo a_APM_projectName)
 		APM_message(STATUS "Search project ${a_APM_projectName} in repo ${a_APM_repo} of type FOLDER and location ${l_APM_repositoryLocation}")
 		if(EXISTS "${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
 			include("${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
-			APM_install(VERSION APM_require_VERSION)
+			APM_install(VERSION ${APM_require_VERSION})
 		else(EXISTS "${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
 			APM_message(STATUS "Merde alors... ${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")
 		endif(EXISTS "${l_APM_repositoryLocation}/APM_${a_APM_projectName}.cmake")

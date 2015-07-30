@@ -1,6 +1,8 @@
 include(CMakeParseArguments)
 include(ExternalProject)
 
+include(cmake/APM_ArgumentsUtils.cmake)
+
 set(APM_DEFAULT_REPOSITORY_DIR "C:/Developpements/APM/repo")
 if(MSVC)
 	if(CMAKE_CL_64)
@@ -23,19 +25,6 @@ endmacro()
 macro(APM_parentScope a_APM_Variable)
 	set(${a_APM_Variable} ${${a_APM_Variable}} PARENT_SCOPE)
 endmacro()
-
-#
-#macro(APM_GLOB_RECURSE_DIR result curdir)
-#  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
-#  SET(dirlist "")
-#  FOREACH(child ${children})
-#    IF(IS_DIRECTORY ${curdir}/${child})
- #       LIST(APPEND dirlist ${child})
- #   ENDIF()
-#  ENDFOREACH()
- # SET(${result} ${dirlist})
-#endmacro()
-
 
 function(APM_ExternalProject_Add a_APM_name a_APM_version)
 	# Managing arguments

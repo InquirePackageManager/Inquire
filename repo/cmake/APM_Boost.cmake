@@ -1,70 +1,4 @@
-function(APM_compiler_version a_APM_result)
-	if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
-      OR CMAKE_CXX_COMPILER MATCHES "icl"
-      OR CMAKE_CXX_COMPILER MATCHES "icpc")
-    set (l_APM_version "")
-  elseif (MSVC14)
-    set(l_APM_version "14.0")
-  elseif (MSVC12)
-    set(l_APM_version "12.0")
-  elseif (MSVC11)
-    set(l_APM_version "11.0")
-  elseif (MSVC10)
-    set(l_APM_version "10.0")
-  elseif (MSVC90)
-    set(l_APM_version "9.0")
-  elseif (MSVC80)
-    set(l_APM_version "8.0")
-  elseif (MSVC71)
-    set(l_APM_version "7.1")
-  elseif (MSVC70) # Good luck! (That's from Kitware, but I'm not sure here at biicode we support VC6.0 and 7.0 too. So good luck from the hive too!)
-    set(l_APM_version "7.0") # yes, this is correct
-  elseif (MSVC60) # Good luck!
-    set(l_APM_version "6.0") # yes, this is correct
-  elseif (BORLAND)
-    set(l_APM_version "")
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "SunPro")
-    set(l_APM_version "")
-  else()
-	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE l_APM_version )
-		string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" l_APM_version ${l_APM_version})
-	elseif(CMAKE_COMPILER_IS_GNUCXX)
-		EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE l_APM_version)
-		string (REGEX REPLACE "([0-9])\\.([0-9])\\.([0-9])" "\\1.\\2.\\3" l_APM_version ${l_APM_version})
-    string(STRIP ${l_APM_version} l_APM_version) #Remove extra newline character
-	endif()
-  endif()
-  set(${a_APM_result} ${l_APM_version} PARENT_SCOPE)
-endfunction()
-
-function(APM_compute_toolset a_APM_result)
-	if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
-      OR CMAKE_CXX_COMPILER MATCHES "icl"
-      OR CMAKE_CXX_COMPILER MATCHES "icpc")
-		set(_APM_toolset "intel")
-	elseif(MSVC)
-		set(_APM_toolset "msvc")
-	elseif(BORLAND)
-		set(_APM_toolset "borland")
-	elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		set(_APM_toolset "clang")
-	elseif(CMAKE_COMPILER_IS_GNUCXX)
-		set(_APM_toolset "gcc")
-	else()
-		message(FATAL_ERROR "Unknown compiler, unable to compute toolset")
-	endif()
-
-	APM_compiler_version(l_APM_version)
-
-    if(l_APM_version AND (NOT (CMAKE_SYSTEM_NAME MATCHES "Darwin")))
-		set(${a_APM_result} "${_APM_toolset}-${l_APM_version}" PARENT_SCOPE)
-	else()
-		set(${a_APM_result} "${_APM_toolset}" PARENT_SCOPE)
-	endif()
-endfunction()
-
-
+include(APM_CompilerUtils.cmake)
 
 function(APM_require)
 	# Managing arguments
@@ -72,6 +6,18 @@ function(APM_require)
 	set(l_APM_OneValueArguments VERSION)
 	set(l_APM_MultipleValuesArguments TARGETS COMPONENTS)
 	cmake_parse_arguments(l_APM_require "${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
+	
+	#########################
+	#TODO : implement a function to set arguments like
+	# function(APM_set a_APM_variableType a_APM_variableName)
+	# ex. :
+	# APM_set(APM_OPTION_ARG QUIET)
+	# APM_set(APM_ONE_VALUE_ARG VERSION 1.2.3)
+	# APM_set(APM_MULTIPLE_VALUE_ARG TARGETS Foo Bar)
+	#
+	#
+	# Idem, create a function APM_puch_back for adding values to APM_MULTIPLE_VALUE_ARG
+	APM_filter_arguments(l_APM_fiteredArgs "${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
 	
 	
 	set(l_APM_find_package_args)

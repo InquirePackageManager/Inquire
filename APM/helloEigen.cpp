@@ -1,7 +1,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 
-#include "boost\filesystem.hpp"
+//#include "boost\filesystem.hpp"
 
 using Eigen::MatrixXd;
 int main()
@@ -12,10 +12,10 @@ int main()
   m(0,1) = -1;
   m(1,1) = m(1,0) + m(0,1);
   std::cout << m << std::endl;
-
+/*
   boost::filesystem::path p("C:\\Developpements\\APM\\APM_build\\HelloEigenProject.sln");
 
   if (exists(p)){
 	  std::cout << "OK" << std::endl;
-  }
+  }*/
 }

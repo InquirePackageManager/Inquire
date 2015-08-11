@@ -1,5 +1,3 @@
-include(APM_CompilerUtils.cmake)
-
 function(APM_require)
 	# Managing arguments
 	set(l_APM_OptionArguments OPTIONAL REQUIRED QUIET EXACT)

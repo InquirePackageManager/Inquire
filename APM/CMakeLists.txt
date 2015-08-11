@@ -1,28 +1,16 @@
 cmake_minimum_required (VERSION 3.0.0)
 project (HelloEigenProject)
+set(APM_DEBUG ON)
 
 include(cmake/APM.cmake)
 
 add_executable(HelloEigen helloEigen.cpp)
+# an APM module repository is a place (folder, GIT repo, etc.) containing CMake modules to "require" projects.
+APM_add_module_repository(moduleRepo FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/../modules/")
 
-#add_repository(localRepo FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/../repo/")
-
-#require(Eigen3 VERSION 3.2.5 TARGETS HelloEigen REPOSITORY localRepo)
-#require(Boost VERSION 1.57.0 TARGETS HelloEigen COMPONENTS filesystem system)
-
-
-
-	set(l_APM_OptionArguments OPTIONAL REQUIRED QUIET EXACT)
-	set(l_APM_OneValueArguments VERSION)
-	set(l_APM_MultipleValuesArguments TARGETS COMPONENTS)
-	
-	
-	set(l_APM_previousArgs VERSION 1.57.0 TARGETS HelloEigen COMPONENTS filesystem system)
+# an APM package repository contains all the built libraries and sources.
+APM_add_package_repository(packageRepo FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/../packages/")
 
 
-APM_set_argument(res l_APM_previousArgs APM_OPTION_ARG_TYPE QUIET True)
-#APM_set_argument(res res APM_ONE_VALUE_ARG_TYPE VERSION 1.58.0)
-APM_set_argument(res res APM_MULTIPLE_VALUE_ARG_TYPE TARGETS Foo Bar Baz)
-
-message("l_APM_previousArgs = ${l_APM_previousArgs}")
-message("res = ${res}")
+require(Eigen3 VERSION 3.2.5 TARGETS HelloEigen PACKAGE_REPOSITORY packageRepo)
+require(Boost VERSION 1.57.0 TARGETS HelloEigen COMPONENTS filesystem system)

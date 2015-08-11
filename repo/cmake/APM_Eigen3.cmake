@@ -46,10 +46,14 @@ function(APM_require)
 		
 		APM_message(STATUS "Calling find_package...")
 		find_package(Eigen3 ${l_APM_find_package_args} MODULE)
-	endif(l_APM_fileLocation)
+	else()
+		APM_message(DEBUG "Unable to find Eigen3 find module.")
+		set(Eigen3_FOUND FALSE)
+	endif()
 	
 	#if eigen was not found, just install it through APM_ExternalProject_Add
 	if(NOT Eigen3_FOUND)
+		APM_message(DEBUG "Eigen3 not found. Installing it.")
 		set(l_APM_EigenLocation "https://bitbucket.org/eigen/eigen/get/${l_APM_require_VERSION}.tar.bz2")
 		set(l_APM_EigenLocalDir "${APM_REPOSITORY_DIR}/Eigen/${l_APM_require_VERSION}")
 
@@ -57,9 +61,12 @@ function(APM_require)
 		APM_ExternalProject_Add(Eigen ${l_APM_require_VERSION}
 			URL ${l_APM_EigenLocation}
 		)
-		
-		set(Eigen3_INCLUDE_DIR "${APM_Eigen_${l_APM_underscore_version}_INSTALL_DIR}/include/eigen3")
-	endif(NOT Eigen3_FOUND)
+		if(Eigen3_FOUND)
+			set(Eigen3_INCLUDE_DIR "${APM_Eigen_${l_APM_underscore_version}_INSTALL_DIR}/include/eigen3")
+		else()
+			APM_message(SEND_ERROR "Unable to find Eigen3.")
+		endif()
+	endif()
 
 	#add include directories to targets
 	if(NOT l_APM_require_TARGETS)

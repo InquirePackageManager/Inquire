@@ -8,6 +8,7 @@ before_install:
   - ls
   
 script: 
+  - ls
   - cd test
   - mkdir test_build
   - cd test_build

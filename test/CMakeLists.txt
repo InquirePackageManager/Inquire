@@ -3,6 +3,9 @@ project (HelloEigenProject)
 set(APM_DEBUG ON)
 
 include(../APM.cmake)
+#force installation of eigen and boost on travis...
+set(APM_install_Eigen3 ON)
+set(APM_install_Boost ON)
 
 
 add_executable(HelloEigen helloEigen.cpp)

@@ -92,8 +92,8 @@ function(APM_install_package)
 	set(l_APM_RootProjectDir "${l_APM_repo_location}/Boost/${l_APM_install_package_VERSION}")
 
 	set(l_APM_archiveName "boost_${l_APM_underscore_version}.${l_APM_PACKAGE_TYPE}")
-	#set(l_APM_BoostLocation "http://sourceforge.net/projects/boost/files/boost/${l_APM_install_package_VERSION}/${l_APM_archiveName}")
-	set(l_APM_BoostLocation "C:/developpements/APM/${l_APM_archiveName}")
+	set(l_APM_BoostLocation "http://sourceforge.net/projects/boost/files/boost/${l_APM_install_package_VERSION}/${l_APM_archiveName}")
+	#set(l_APM_BoostLocation "C:/developpements/APM/${l_APM_archiveName}")
 	set(l_APM_BoostLocalDir ${l_APM_RootProjectDir})
 	set(l_APM_BoostLocalArchive "${l_APM_BoostLocalDir}/download/${l_APM_archiveName}")
 

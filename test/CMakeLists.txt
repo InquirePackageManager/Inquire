@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.0.0)
 project (HelloEigenProject)
 set(APM_DEBUG ON)
 
-include(cmake/APM.cmake)
+include(../cmake/APM.cmake)
 
 
 add_executable(HelloEigen helloEigen.cpp)

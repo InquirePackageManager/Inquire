@@ -5,6 +5,7 @@ compiler: clang
 before_install:
   - echo $LANG
   - echo $LC_ALL
+  - ls
   
 script: 
   - cd tests

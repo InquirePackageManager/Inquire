@@ -10,6 +10,6 @@ script:
   - cd test
   - mkdir test_build
   - cd test_build
-  - cmake ..
+  - $cmakeBin ..
 
 os: linux

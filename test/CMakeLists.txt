@@ -4,8 +4,9 @@ set(APM_DEBUG ON)
 
 include(../APM.cmake)
 #force installation of eigen and boost on travis...
-set(APM_install_Eigen3 ON)
-set(APM_install_Boost ON)
+set(APM_install_Eigen3 ON CACHE BOOL)
+set(APM_install_Boost ON CACHE BOOL)
+
 
 
 add_executable(HelloEigen helloEigen.cpp)

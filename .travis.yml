@@ -5,7 +5,11 @@ compiler: clang
 before_install:
   - echo $LANG
   - echo $LC_ALL
+  
+script: 
+  - cd tests
+  - mkdir tests_build
+  - cd test_build
+  - cmake ..
 
-os:
-  - linux
-  - osx
+os: linux

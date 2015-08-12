@@ -7,7 +7,6 @@ install:
 script:
   - export cmakeBin = $(pwd)/cmake-3.3.0-Linux-x86_64/bin/cmake 
   - echo $cmakeBin
-script: 
   - cd test
   - mkdir test_build
   - cd test_build

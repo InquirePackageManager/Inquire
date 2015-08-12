@@ -29,35 +29,35 @@ else()
 
 	set(${a_APM_res} ${${a_APM_res}} PARENT_SCOPE)
 endfunction()
-
-function(APM_filter_arguments_for_find_package a_APM_OptionArguments a_APM_OneValueArguments a_APM_MultipleValuesArguments a_APM_res)
-	set(l_APM_OptionArguments EXACT QUIET MODULE REQUIRED NO_POLICY_SCOPE)
-	set(l_APM_OneValueArguments VERSION)
-	set(l_APM_MultipleValuesArguments COMPONENTS OPTIONAL_COMPONENTS)
-	APM_message("ARGN = ${ARGN}")
-	APM_filter_arguments(${a_APM_res} 	"${a_APM_OptionArguments}" "${a_APM_OneValueArguments}" "${a_APM_MultipleValuesArguments}"
-										"${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
-	APM_message("a_APM_res = ${a_APM_res}")
-	APM_parentScope(a_APM_res)
-endfunction()
-
-function(APM_filter_arguments_for_APM_find_package a_APM_OptionArguments a_APM_OneValueArguments a_APM_MultipleValuesArguments a_APM_res)
-	set(l_APM_OptionArguments EXACT QUIET MODULE REQUIRED NO_POLICY_SCOPE)
-	set(l_APM_OneValueArguments VERSION)
-	set(l_APM_MultipleValuesArguments COMPONENTS OPTIONAL_COMPONENTS)
-	APM_filter_arguments(${a_APM_res} 	"${a_APM_OptionArguments}" "${a_APM_OneValueArguments}" "${a_APM_MultipleValuesArguments}"
-										"${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
-	APM_parentScope(a_APM_res)
-endfunction()
-
-function(APM_filter_arguments_for_install_package a_APM_OptionArguments a_APM_OneValueArguments a_APM_MultipleValuesArguments a_APM_res)
-	set(l_APM_OptionArguments EXACT QUIET MODULE REQUIRED NO_POLICY_SCOPE)
-	set(l_APM_OneValueArguments VERSION)
-	set(l_APM_MultipleValuesArguments COMPONENTS OPTIONAL_COMPONENTS TARGETS)
-	APM_filter_arguments(${a_APM_res} 	"${a_APM_OptionArguments}" "${a_APM_OneValueArguments}" "${a_APM_MultipleValuesArguments}"
-										"${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
-	APM_parentScope(a_APM_res)
-endfunction()
+#
+# function(APM_filter_arguments_for_find_package a_APM_OptionArguments a_APM_OneValueArguments a_APM_MultipleValuesArguments a_APM_res)
+# 	set(l_APM_OptionArguments EXACT QUIET MODULE REQUIRED NO_POLICY_SCOPE)
+# 	set(l_APM_OneValueArguments VERSION)
+# 	set(l_APM_MultipleValuesArguments COMPONENTS OPTIONAL_COMPONENTS)
+# 	APM_message("ARGN = ${ARGN}")
+# 	APM_filter_arguments(${a_APM_res} 	"${a_APM_OptionArguments}" "${a_APM_OneValueArguments}" "${a_APM_MultipleValuesArguments}"
+# 										"${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
+# 	APM_message("a_APM_res = ${a_APM_res}")
+# 	APM_parentScope(a_APM_res)
+# endfunction()
+#
+# function(APM_filter_arguments_for_APM_find_package a_APM_OptionArguments a_APM_OneValueArguments a_APM_MultipleValuesArguments a_APM_res)
+# 	set(l_APM_OptionArguments EXACT QUIET MODULE REQUIRED NO_POLICY_SCOPE)
+# 	set(l_APM_OneValueArguments VERSION)
+# 	set(l_APM_MultipleValuesArguments COMPONENTS OPTIONAL_COMPONENTS)
+# 	APM_filter_arguments(${a_APM_res} 	"${a_APM_OptionArguments}" "${a_APM_OneValueArguments}" "${a_APM_MultipleValuesArguments}"
+# 										"${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
+# 	APM_parentScope(a_APM_res)
+# endfunction()
+#
+# function(APM_filter_arguments_for_install_package a_APM_OptionArguments a_APM_OneValueArguments a_APM_MultipleValuesArguments a_APM_res)
+# 	set(l_APM_OptionArguments EXACT QUIET MODULE REQUIRED NO_POLICY_SCOPE)
+# 	set(l_APM_OneValueArguments VERSION)
+# 	set(l_APM_MultipleValuesArguments COMPONENTS OPTIONAL_COMPONENTS TARGETS)
+# 	APM_filter_arguments(${a_APM_res} 	"${a_APM_OptionArguments}" "${a_APM_OneValueArguments}" "${a_APM_MultipleValuesArguments}"
+# 										"${l_APM_OptionArguments}" "${l_APM_OneValueArguments}" "${l_APM_MultipleValuesArguments}" ${ARGN})
+# 	APM_parentScope(a_APM_res)
+# endfunction()
 
 
 

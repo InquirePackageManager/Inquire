@@ -130,9 +130,8 @@ endfunction()
 
 
 function(APM_configure_targets)
-	cmake_parse_arguments(l_APM_configure_targets "" "INSTALL_DIR" "TARGETS;COMPONENTS" ${ARGN})
-
-	APM_message(DEBUG "l_APM_configure_targets_COMPONENTS = ${l_APM_configure_targets_COMPONENTS}")
+	APM_configure_targets_parse_arguments(l_APM_configure_targets ${ARGN})
+	# cmake_parse_arguments(l_APM_configure_targets "" "INSTALL_DIR" "TARGETS;COMPONENTS" ${ARGN})
 
 	set(BOOST_ROOT ${l_APM_configure_targets_INSTALL_DIR})
 

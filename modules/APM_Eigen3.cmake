@@ -33,7 +33,8 @@ function(APM_install_package)
 endfunction()
 
 function(APM_configure_targets)
-	cmake_parse_arguments(l_APM_configure_targets "" "INSTALL_DIR" "TARGETS;COMPONENTS" ${ARGN})
+	APM_configure_targets_parse_arguments(l_APM_configure_targets ${ARGN})
+	# cmake_parse_arguments(l_APM_configure_targets "" "INSTALL_DIR" "TARGETS;COMPONENTS" ${ARGN})
 
 	set(l_APM_include_dir "${l_APM_configure_targets_INSTALL_DIR}/include/eigen3")
 	if(NOT DEFINED l_APM_configure_targets_TARGETS)

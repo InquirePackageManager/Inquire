@@ -8,8 +8,8 @@ before_install:
   - ls
   
 script: 
-  - cd tests
-  - mkdir tests_build
+  - cd test
+  - mkdir test_build
   - cd test_build
   - cmake ..
 

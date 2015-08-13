@@ -1,0 +1,6 @@
+[submodule "modules/APM_boost"]
+	path = modules/APM_boost
+	url = https://www.github.com/FlorianChevassu/APM_boost.git
+[submodule "modules/APM_eigen3"]
+	path = modules/APM_eigen3
+	url = https://www.github.com/FlorianChevassu/APM_eigen3.git

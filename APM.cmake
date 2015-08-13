@@ -10,69 +10,7 @@ else(APM_INCLUDE_GUARD)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_utils.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_arguments_utils.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_compiler_utils.cmake)
-
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_module_utils.cmake)
-
-
-
-	macro(APM_init)
-		#################################################
-		##				Global arguments				#
-		#################################################
-		# if true, no messages will be printed
-		APM_defaultSet(APM_QUIET FALSE)
-
-		# if true, debug messages will be printed to screen.
-		APM_defaultSet(APM_DEBUG FALSE)
-
-		# APM configuration folder
-		if(WIN32 OR CYGWIN)
-			set(APM_DATA_DIRECTORY $ENV{USERPROFILE}/.apm)
-		else()
-			set(APM_DATA_DIRECTORY $ENV{HOME}/.apm)
-		endif()
-		set(APM_CONFIG_FILE ${APM_DATA_DIRECTORY}/settings.cmake)
-
-		if(EXISTS ${APM_DATA_DIRECTORY})
-			APM_message(DEBUG "${APM_DATA_DIRECTORY} already exists.")
-		else()
-			APM_message(DEBUG "${APM_DATA_DIRECTORY} does not exist.")
-			APM_message(DEBUG "Creating directory ${APM_DATA_DIRECTORY}...")
-			file(MAKE_DIRECTORY ${APM_DATA_DIRECTORY})
-			if(EXISTS ${APM_DATA_DIRECTORY})
-				APM_message(DEBUG "Creating directory ${APM_DATA_DIRECTORY}... OK")
-			else()
-				APM_message(SEND_ERROR "Creating directory ${APM_DATA_DIRECTORY}... ERROR")
-				APM_message(SEND_ERROR "Directory ${APM_DATA_DIRECTORY} could not be created. User settings will not be available.")
-			endif()
-		endif()
-		if(NOT EXISTS ${APM_CONFIG_FILE})
-			APM_message(DEBUG "Creating default configuration file in ${APM_CONFIG_FILE}...")
-			file(WRITE ${APM_CONFIG_FILE} "#APM configuration file.")
-			if(EXISTS ${APM_CONFIG_FILE})
-				APM_message(DEBUG "Creating default configuration file in ${APM_CONFIG_FILE}... OK")
-			else()
-				APM_message(SEND_ERROR "Creating default configuration file in ${APM_CONFIG_FILE}... ERROR")
-				APM_message(SEND_ERROR "User settings file ${APM_CONFIG_FILE} could not be created. User settings will not be available.")
-			endif()
-		endif()
-
-		APM_defaultSet(APM_DEFAULT_PACKAGE_REPOSITORY_DIR ${APM_DATA_DIRECTORY}/packages)
-		APM_message(DEBUG "Default package repository location : ${APM_DEFAULT_PACKAGE_REPOSITORY_DIR}")
-		APM_add_package_repository(APM_DEFAULT_PACKAGE_REPOSITORY FOLDER "${APM_DEFAULT_PACKAGE_REPOSITORY_DIR}")
-
-
-		if(MSVC)
-			if(CMAKE_CL_64)
-				set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-64bits-${CMAKE_CXX_COMPILER_VERSION}")
-			else(CMAKE_CL_64)
-				set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-32bits-${CMAKE_CXX_COMPILER_VERSION}")
-			endif(CMAKE_CL_64)
-		else(MSVC)
-			set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
-		endif(MSVC)
-		APM_message(DEBUG "Compiler id : ${APM_COMPILER_ID}")
-	endmacro()
 
 	#################################################
 	#				User functions					#
@@ -343,24 +281,60 @@ else(APM_INCLUDE_GUARD)
 	endfunction()
 
 
+	############################
+	##     Initialization     ##
+	############################
+	# if true, no messages will be printed
+	APM_defaultSet(APM_QUIET FALSE)
+
+	# if true, debug messages will be printed to screen.
+	APM_defaultSet(APM_DEBUG FALSE)
+
+	# APM configuration folder
+	if(WIN32 OR CYGWIN)
+		set(APM_DATA_DIRECTORY $ENV{USERPROFILE}/.apm)
+	else()
+		set(APM_DATA_DIRECTORY $ENV{HOME}/.apm)
+	endif()
+	set(APM_CONFIG_FILE ${APM_DATA_DIRECTORY}/settings.cmake)
+
+	if(EXISTS ${APM_DATA_DIRECTORY})
+		APM_message(DEBUG "${APM_DATA_DIRECTORY} already exists.")
+	else()
+		APM_message(DEBUG "${APM_DATA_DIRECTORY} does not exist.")
+		APM_message(DEBUG "Creating directory ${APM_DATA_DIRECTORY}...")
+		file(MAKE_DIRECTORY ${APM_DATA_DIRECTORY})
+		if(EXISTS ${APM_DATA_DIRECTORY})
+			APM_message(DEBUG "Creating directory ${APM_DATA_DIRECTORY}... OK")
+		else()
+			APM_message(SEND_ERROR "Creating directory ${APM_DATA_DIRECTORY}... ERROR")
+			APM_message(SEND_ERROR "Directory ${APM_DATA_DIRECTORY} could not be created. User settings will not be available.")
+		endif()
+	endif()
+	if(NOT EXISTS ${APM_CONFIG_FILE})
+		APM_message(DEBUG "Creating default configuration file in ${APM_CONFIG_FILE}...")
+		file(WRITE ${APM_CONFIG_FILE} "#APM configuration file.")
+		if(EXISTS ${APM_CONFIG_FILE})
+			APM_message(DEBUG "Creating default configuration file in ${APM_CONFIG_FILE}... OK")
+		else()
+			APM_message(SEND_ERROR "Creating default configuration file in ${APM_CONFIG_FILE}... ERROR")
+			APM_message(SEND_ERROR "User settings file ${APM_CONFIG_FILE} could not be created. User settings will not be available.")
+		endif()
+	endif()
+
+	APM_defaultSet(APM_DEFAULT_PACKAGE_REPOSITORY_DIR ${APM_DATA_DIRECTORY}/packages)
+	APM_message(DEBUG "Default package repository location : ${APM_DEFAULT_PACKAGE_REPOSITORY_DIR}")
+	APM_add_package_repository(APM_DEFAULT_PACKAGE_REPOSITORY FOLDER "${APM_DEFAULT_PACKAGE_REPOSITORY_DIR}")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	APM_init()
+	if(MSVC)
+		if(CMAKE_CL_64)
+			set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-64bits-${CMAKE_CXX_COMPILER_VERSION}")
+		else(CMAKE_CL_64)
+			set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-32bits-${CMAKE_CXX_COMPILER_VERSION}")
+		endif(CMAKE_CL_64)
+	else(MSVC)
+		set(APM_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
+	endif(MSVC)
+	APM_message(DEBUG "Compiler id : ${APM_COMPILER_ID}")
 endif(APM_INCLUDE_GUARD)

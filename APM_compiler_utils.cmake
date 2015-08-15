@@ -69,4 +69,34 @@ else()
 		endif()
 	endfunction()
 
+
+function(APM_boost_set_clang_compiler a_APM_lib_dir a_APM_result)
+	# FindBoost auto-compute does not care about Clang?
+	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		if(NOT (CMAKE_SYSTEM_NAME MATCHES "Darwin"))
+			APM_compiler_version(l_APM_clang_version)#In boost/install/utils.cmake
+			#Some regex kung-fu
+			string(REGEX REPLACE "([0-9])\\.([0-9])" "\\1\\2" l_APM_clang_version ${l_APM_clang_version})
+			set(l_APM_boost_compiler "-clang${l_APM_clang_version}")
+		else()
+			#On Darwin (OSX) the suffix is extracted from library binary names. That's why this setup is
+			#done after build
+			file(GLOB l_APM_clang_libs RELATIVE ${a_APM_lib_dir} "${a_APM_lib_dir}/*clang*")
+			if(l_APM_clang_libs)
+				list(GET l_APM_clang_libs 0 l_APM_clang_lib)
+				message(STATUS ">>> Suffix source: ${l_APM_clang_lib}")
+
+				#More kung-fu
+				string(REGEX REPLACE ".*(-clang-darwin[0-9]+).*" "\\1" l_APM_clang_lib_suffix ${l_APM_clang_lib})
+				message(STATUS ">>>> Suffix: ${l_APM_clang_lib_suffix}")
+				set(l_APM_boost_compiler ${l_APM_clang_lib_suffix})
+			else()
+				APM_message(FATAL_ERROR "Unable to compute Boost compiler suffix from Clang libraries names")
+			endif()
+		endif()
+		message(STATUS ">>>> Setting l_APM_boost_compiler suffix manually for clang: ${l_APM_boost_compiler}")
+		set(${a_APM_result} ${l_APM_boost_compiler} PARENT_SCOPE)
+	endif()
+endfunction()
+
 endif()

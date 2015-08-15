@@ -41,7 +41,7 @@ else()
 	###########################################
 
 	set(APM_configure_targets_option_arguments )
-	set(APM_configure_targets_one_value_arguments INSTALL_DIR)
+	set(APM_configure_targets_one_value_arguments INSTALL_DIR VERSION)
 	set(APM_configure_targets_multiple_values_arguments COMPONENTS TARGETS)
 
 	macro(APM_configure_targets_parse_arguments a_APM_prefix)

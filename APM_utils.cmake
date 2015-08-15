@@ -4,7 +4,7 @@ else()
 	set(APM_UTILS_INCLUDE_GUARD ON)
 
 	#################################################
-	#				APM utilities					#
+	#                 APM utilities                 #
 	#################################################
 	function(APM_message)
 		set(l_APM_message_OptionArguments DEBUG)

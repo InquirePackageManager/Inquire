@@ -6,13 +6,24 @@ else()
 	#################################################
 	#                 APM utilities                 #
 	#################################################
+	#TODO : create varibales like APM_LOG_LEVEL_INFO_PREFIX to configure output...
 	function(APM_message)
-		set(l_APM_message_OptionArguments DEBUG)
+		set(l_APM_message_OptionArguments ALL DEBUG ERROR FATAL INFO OFF TRACE WARN)
 		cmake_parse_arguments(l_APM_message "${l_APM_message_OptionArguments}" "" "" ${ARGN})
-		if(l_APM_message_DEBUG AND APM_DEBUG)
-			message("DEBUG : " ${l_APM_message_UNPARSED_ARGUMENTS})
-		elseif(NOT l_APM_message_DEBUG AND NOT APM_QUIET)
-			message(${l_APM_message_UNPARSED_ARGUMENTS})
+		if(l_APM_message_DEBUG AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_DEBUG))
+			message(STATUS "DEBUG : " ${l_APM_message_UNPARSED_ARGUMENTS})
+		elseif(l_APM_message_ERROR AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_ERROR))
+			message(SEND_ERROR "ERROR : " ${l_APM_message_UNPARSED_ARGUMENTS})
+		elseif(l_APM_message_FATAL)# For fatal errors, always print it...
+			message(FATAL_ERROR ${l_APM_message_UNPARSED_ARGUMENTS})
+		elseif(l_APM_message_INFO AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_INFO))
+			message(STATUS "INFO : " ${l_APM_message_UNPARSED_ARGUMENTS})
+		elseif(l_APM_message_TRACE AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_TRACE))
+			message(STATUS "TRACE : " ${l_APM_message_UNPARSED_ARGUMENTS})
+		elseif(l_APM_message_WARN AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_WARN))
+			message(WARNING "WARN : " ${l_APM_message_UNPARSED_ARGUMENTS})
+		else()
+			message(STATUS ${l_APM_message_UNPARSED_ARGUMENTS})
 		endif()
 	endfunction()
 

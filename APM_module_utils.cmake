@@ -20,18 +20,18 @@ else()
 											${ARGN})
 	endmacro()
 
-	#########################################
-	#			APM_compile_package arguments			#
-	#########################################
+	#############################################
+	#			compile_package_version arguments			#
+	#############################################
 
-	set(APM_compile_package_option_arguments REQUIRED QUIET)
-	set(APM_compile_package_one_value_arguments VERSION SOURCE_DIR)
-	set(APM_compile_package_multiple_values_arguments COMPONENTS TARGETS)
+	set(APM_compile_package_version_option_arguments )
+	set(APM_compile_package_version_one_value_arguments )
+	set(APM_compile_package_version_multiple_values_arguments COMPONENTS)
 
-	macro(APM_compile_package_parse_arguments a_APM_prefix)
-		APM_parse_arguments(${a_APM_prefix} "${APM_compile_package_option_arguments}"
-											"${APM_compile_package_one_value_arguments}"
-											"${APM_compile_package_multiple_values_arguments}"
+	macro(APM_compile_package_version_parse_arguments a_APM_prefix)
+		APM_parse_arguments(${a_APM_prefix} "${APM_compile_package_version_option_arguments}"
+											"${APM_compile_package_version_one_value_arguments}"
+											"${APM_compile_package_version_multiple_values_arguments}"
 											${ARGN})
 	endmacro()
 
@@ -51,6 +51,70 @@ else()
 											${ARGN})
 	endmacro()
 
+
+
+	#################################################
+	#     check_package_compatibility arguments     #
+	#################################################
+
+	set(APM_check_package_compatibility_option_arguments )
+	set(APM_check_package_compatibility_one_value_arguments DETAILS)
+	set(APM_check_package_compatibility_multiple_values_arguments )
+
+	macro(APM_check_package_compatibility_parse_arguments a_APM_prefix)
+		APM_parse_arguments(${a_APM_prefix} "${APM_install_package_option_arguments}"
+											"${APM_install_package_one_value_arguments}"
+											"${APM_install_package_multiple_values_arguments}"
+											${ARGN})
+	endmacro()
+
+
+	#################################################
+	#     check_package_compatibility arguments     #
+	#################################################
+
+	set(APM_get_compatible_package_version_root_option_arguments EXACT)
+	set(APM_get_compatible_package_version_root_one_value_arguments )
+	set(APM_get_compatible_package_version_root_multiple_values_arguments )
+
+	macro(APM_get_compatible_package_version_root_parse_arguments a_APM_prefix)
+		APM_parse_arguments(${a_APM_prefix} "${APM_install_package_option_arguments}"
+											"${APM_install_package_one_value_arguments}"
+											"${APM_install_package_multiple_values_arguments}"
+											${ARGN})
+	endmacro()
+
+
+	######################################################
+	#     package_version_need_compilation arguments     #
+	######################################################
+
+	set(APM_package_version_need_compilation_option_arguments )
+	set(APM_package_version_need_compilation_one_value_arguments )
+	set(APM_package_version_need_compilation_multiple_values_arguments COMPONENTS)
+
+	macro(APM_package_version_need_compilation_parse_arguments a_APM_prefix)
+		APM_parse_arguments(${a_APM_prefix} "${APM_install_package_option_arguments}"
+											"${APM_install_package_one_value_arguments}"
+											"${APM_install_package_multiple_values_arguments}"
+											${ARGN})
+	endmacro()
+
+
+	######################################################
+	#     configure_package_version arguments     #
+	######################################################
+
+	set(APM_configure_package_version_parse_arguments_option_arguments )
+	set(APM_configure_package_version_parse_arguments_one_value_arguments )
+	set(APM_configure_package_version_parse_arguments_multiple_values_arguments COMPONENTS)
+
+	macro(APM_configure_package_version_parse_arguments a_APM_prefix)
+		APM_parse_arguments(${a_APM_prefix} "${APM_install_package_option_arguments}"
+											"${APM_install_package_one_value_arguments}"
+											"${APM_install_package_multiple_values_arguments}"
+											${ARGN})
+	endmacro()
 
 
 

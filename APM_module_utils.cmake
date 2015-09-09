@@ -106,13 +106,13 @@ else()
 	######################################################
 
 	set(APM_configure_package_version_parse_arguments_option_arguments )
-	set(APM_configure_package_version_parse_arguments_one_value_arguments )
-	set(APM_configure_package_version_parse_arguments_multiple_values_arguments COMPONENTS)
+	set(APM_configure_package_version_parse_arguments_one_value_arguments FILES_TO_INCLUDE)
+	set(APM_configure_package_version_parse_arguments_multiple_values_arguments COMPONENTS TARGETS)
 
 	macro(APM_configure_package_version_parse_arguments a_APM_prefix)
-		APM_parse_arguments(${a_APM_prefix} "${APM_install_package_option_arguments}"
-											"${APM_install_package_one_value_arguments}"
-											"${APM_install_package_multiple_values_arguments}"
+		APM_parse_arguments(${a_APM_prefix} "${APM_configure_package_version_parse_arguments_option_arguments}"
+											"${APM_configure_package_version_parse_arguments_one_value_arguments}"
+											"${APM_configure_package_version_parse_arguments_multiple_values_arguments}"
 											${ARGN})
 	endmacro()
 

@@ -160,7 +160,7 @@ else(APM_INCLUDE_GUARD)
 		#
 		if(DEFINED APM_${a_APM_projectName}_DIR)
 			APM_message(INFO "Using provided path as package root : ${APM_${a_APM_projectName}_DIR}")
-			configure_package_version(${${APM_${a_APM_projectName}_DIR}} COMPONENTS ${l_APM_require_package_COMPONENTS} TARGETS ${l_APM_require_package_TARGETS})
+			configure_package_version(${${APM_${a_APM_projectName}_DIR}} COMPONENTS ${l_APM_require_package_COMPONENTS} TARGETS ${l_APM_require_package_TARGETS} FILES_TO_INCLUDE ${l_APM_require_package_FILES_TO_INCLUDE})
 			return()
 		endif()
 
@@ -181,9 +181,9 @@ else(APM_INCLUDE_GUARD)
 
 			# then check if a compatible version of the package is available
 			if(${l_APM_require_package_EXACT})
-				get_compatible_package_version_root("${l_APM_repo_location}/${a_APM_projectName}" ${l_APM_require_package_VERSION} l_APM_get_compatible_package_version_root_result)
-			else()
 				get_compatible_package_version_root("${l_APM_repo_location}/${a_APM_projectName}" ${l_APM_require_package_VERSION} EXACT l_APM_get_compatible_package_version_root_result)
+			else()
+				get_compatible_package_version_root("${l_APM_repo_location}/${a_APM_projectName}" ${l_APM_require_package_VERSION} l_APM_get_compatible_package_version_root_result)
 			endif()
 
 			if(DEFINED l_APM_get_compatible_package_version_root_result)
@@ -261,7 +261,8 @@ else(APM_INCLUDE_GUARD)
 			endif()
 		endif()
 
-		configure_package_version(${l_APM_package_version_root} COMPONENTS ${l_APM_require_package_COMPONENTS} TARGETS ${l_APM_require_package_TARGETS})
+		configure_package_version(${l_APM_package_version_root} COMPONENTS ${l_APM_require_package_COMPONENTS} TARGETS ${l_APM_require_package_TARGETS} FILES_TO_INCLUDE ${l_APM_require_package_FILES_TO_INCLUDE})
+		set(${l_APM_require_package_FILES_TO_INCLUDE} "${${l_APM_require_package_FILES_TO_INCLUDE}}" PARENT_SCOPE)
 	endfunction()
 
 

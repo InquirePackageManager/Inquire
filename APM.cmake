@@ -8,7 +8,6 @@ else(APM_INCLUDE_GUARD)
 
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_repository.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_utils.cmake)
-	include(${CMAKE_CURRENT_LIST_DIR}/APM_arguments_utils.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_compiler_utils.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_module_utils.cmake)
 
@@ -79,7 +78,6 @@ else(APM_INCLUDE_GUARD)
 		endif()
 	endmacro()
 
-	#TODO : handle FILES_TO_INCLUDE for cmake based packages
 	function(APM_require_package a_APM_projectName)
 		##################################################################
 		#                       Managing arguments                       #

@@ -1,0 +1,11 @@
+OUTPUT_DIRECTORY = @CMAKE_CURRENT_BINARY_DIR@/doc
+INPUT = @CMAKE_CURRENT_LIST_DIR@
+RECURSIVE = YES
+# add for example *.cpp *.c *.h
+FILE_PATTERNS = *.cmake *.h *.cpp *.c *.hpp
+# allows you to display the source (i.e. the CMake scripts)
+SOURCE_BROWSER = YES
+# include undocumented entities
+EXTRACT_ALL = YES
+# use the CMake doxygen filter for .cmake files
+FILTER_PATTERNS = "*.cmake=@CMakeDoxygenFilter_DIR@/CMakeDoxygen.exe"

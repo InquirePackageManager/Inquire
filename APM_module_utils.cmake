@@ -3,7 +3,32 @@ if(APM_MODULE_UTILS_INCLUDE_GUARD)
 else()
 	set(APM_MODULE_UTILS_INCLUDE_GUARD ON)
 
-	include(${CMAKE_CURRENT_LIST_DIR}/APM_arguments_utils.cmake)
+
+	function(APM_parse_arguments a_APM_prefix a_APM_option_arguments a_APM_one_value_arguments a_APM_multiple_values_arguments)
+		cmake_parse_arguments(${a_APM_prefix}
+			"${a_APM_option_arguments}"
+			"${a_APM_one_value_arguments}"
+			"${a_APM_multiple_values_arguments}"
+			${ARGN})
+
+		foreach(l_APM_option_arg ${a_APM_option_arguments})
+			if(DEFINED ${a_APM_prefix}_${l_APM_option_arg})
+				set(${a_APM_prefix}_${l_APM_option_arg} ${${a_APM_prefix}_${l_APM_option_arg}} PARENT_SCOPE)
+			endif()
+		endforeach()
+
+		foreach(l_APM_one_value_arg ${a_APM_one_value_arguments})
+			if(DEFINED ${a_APM_prefix}_${l_APM_one_value_arg})
+				set(${a_APM_prefix}_${l_APM_one_value_arg} ${${a_APM_prefix}_${l_APM_one_value_arg}} PARENT_SCOPE)
+			endif()
+		endforeach()
+
+		foreach(l_APM_multiple_values_arg ${a_APM_multiple_values_arguments})
+			if(DEFINED ${a_APM_prefix}_${l_APM_multiple_values_arg})
+				set(${a_APM_prefix}_${l_APM_multiple_values_arg} ${${a_APM_prefix}_${l_APM_multiple_values_arg}} PARENT_SCOPE)
+			endif()
+		endforeach()
+	endfunction()
 
 	#########################################
 	#			APM_install_package arguments			#

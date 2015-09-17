@@ -34,3 +34,4 @@ Here is the current list of modules :
 
 - Boost :  [![Build Status](https://travis-ci.org/FlorianChevassu/APM_Boost.svg?branch=master)](https://travis-ci.org/FlorianChevassu/APM_Boost)
 - Eigen3 :  [![Build Status](https://travis-ci.org/FlorianChevassu/APM_Eigen3.svg?branch=master)](https://travis-ci.org/FlorianChevassu/APM_Eigen3)
+- FileInformation :  [![Build Status](https://travis-ci.org/FlorianChevassu/APM_FileInformation.svg?branch=master)](https://travis-ci.org/FlorianChevassu/APM_FileInformation)

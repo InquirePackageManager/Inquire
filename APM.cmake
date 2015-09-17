@@ -1,3 +1,13 @@
+
+	#! \brief Brief description.
+	#!         Brief description continued.
+	#!
+	#!  Detailed description starts here.
+	#!
+	function(testfunc)
+	endfunction()
+
+
 include(CMakeParseArguments)
 include(ExternalProject)
 
@@ -8,6 +18,7 @@ else(APM_INCLUDE_GUARD)
 
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_repository.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_utils.cmake)
+	include(${CMAKE_CURRENT_LIST_DIR}/APM_system_utils.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_compiler_utils.cmake)
 	include(${CMAKE_CURRENT_LIST_DIR}/APM_module_utils.cmake)
 
@@ -15,6 +26,10 @@ else(APM_INCLUDE_GUARD)
 	#                                             User functions                                             #
 	##########################################################################################################
 
+	#! \brief Add a module repository.
+	#!
+	#!  This function add a module repository of type ${a_APM_type} and at location ${a_APM_address}. The variable pointing to the repository is stored in ${a_APM_name} and appended to the global module repository list ${APM_module_repositories}.
+	#!
 	function(APM_add_module_repository a_APM_name a_APM_type a_APM_address)
 		APM_message(DEBUG "Creating module repository ${a_APM_name} of type ${a_APM_type} and address ${a_APM_address}.")
 
@@ -34,14 +49,18 @@ else(APM_INCLUDE_GUARD)
 		#create repository
 		APM_Repository_create(${a_APM_type} ${a_APM_address} ${a_APM_name})
 		#declare repository in parent scope
-		APM_parentScope(${a_APM_name})
+		set(${a_APM_name} ${${a_APM_name}} PARENT_SCOPE)
 
 		#append repository to the list of repositories in current scope
 		list(APPEND APM_module_repositories ${a_APM_name})
 		#apply modifications in parent scope
-		APM_parentScope(APM_module_repositories)
+		set(APM_module_repositories ${APM_module_repositories} PARENT_SCOPE)
 	endfunction()
 
+	#! \brief Add a package repository.
+	#!
+	#!  This function add a package repository of type ${a_APM_type} and at location ${a_APM_address}. The variable pointing to the repository is stored in ${a_APM_name} and appended to the global package repository list ${APM_package_repositories}.
+	#!
 	function(APM_add_package_repository a_APM_name a_APM_type a_APM_address)
 		APM_message(DEBUG "Creating package repository ${a_APM_name} of type ${a_APM_type} and address ${a_APM_address}.")
 		#create the APM_package_repositories global variable if needed
@@ -60,15 +79,19 @@ else(APM_INCLUDE_GUARD)
 		#create repository
 		APM_Repository_create(${a_APM_type} ${a_APM_address} ${a_APM_name})
 		#declare repository in parent scope
-		APM_parentScope(${a_APM_name})
+		set(${a_APM_name} ${${a_APM_name}} PARENT_SCOPE)
 
 		#append repository to the list of repositories in current scope
 		list(APPEND APM_package_repositories ${a_APM_name})
 		#apply modifications in parent scope
-		APM_parentScope(APM_package_repositories)
+		set(APM_package_repositories ${APM_package_repositories} PARENT_SCOPE)
 	endfunction()
 
-	#
+
+	#! \brief Macro requiring a package.
+	#!
+	#!  This macro require is a wrapper around the APM_require_package function, used to allow including files in the scope calling the macro.
+	#!
 	macro(require_package)
 		APM_require_package(${ARGN} FILES_TO_INCLUDE l_APM_files_to_include)
 		if(DEFINED l_APM_files_to_include)
@@ -114,21 +137,21 @@ else(APM_INCLUDE_GUARD)
 		APM_message(INFO "Requiring module APM_${a_APM_projectName}...")
 
 		# Each l_APM_repo contains the name of a repository variable
-		set(l_APM_module_found FALSE)
+		set(${a_APM_projectName}_FOUND FALSE PARENT_SCOPE)
 		foreach(l_APM_repo ${APM_module_repositories})
 			APM_require_module(${l_APM_repo} ${a_APM_projectName} l_APM_module_path)
 			if(DEFINED l_APM_module_path)
-				set(l_APM_module_found TRUE)
+				set(${a_APM_projectName}_FOUND TRUE PARENT_SCOPE)
 				break()
 			endif()
 		endforeach(l_APM_repo)
 
 		#if we did not find the module, either return or send an error depending on the "REQUIRED" flag
-		if(NOT ${l_APM_module_found})
+		if(NOT ${${a_APM_projectName}_FOUND})
 			set(APM_${a_APM_projectName}_FOUND FALSE PARENT_SCOPE)
 			if(${l_APM_require_package_REQUIRED})
-				APM_message(SEND_ERROR "Requiring module APM_${a_APM_projectName}... NOT FOUND")
-				APM_message(FATAL_ERROR "Unable to find the required module APM_${a_APM_projectName}. Aborting.")
+				APM_message(ERROR "Requiring module APM_${a_APM_projectName}... NOT FOUND")
+				APM_message(FATAL "Unable to find the required module APM_${a_APM_projectName}. Aborting.")
 			else()
 				APM_message(INFO "Requiring module APM_${a_APM_projectName}... NOT FOUND")
 			endif()

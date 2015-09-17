@@ -62,7 +62,7 @@ else()
 
 		APM_compiler_version(l_APM_version)
 
-			if(l_APM_version AND (NOT (CMAKE_SYSTEM_NAME MATCHES "Darwin")))
+		if(l_APM_version AND (NOT (CMAKE_SYSTEM_NAME MATCHES "Darwin")))
 			set(${a_APM_result} "${_APM_toolset}-${l_APM_version}" PARENT_SCOPE)
 		else()
 			set(${a_APM_result} "${_APM_toolset}" PARENT_SCOPE)

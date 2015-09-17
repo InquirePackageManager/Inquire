@@ -4,7 +4,7 @@ else()
 	set(APM_UTILS_INCLUDE_GUARD ON)
 
 	#################################################
-	#                 APM utilities                 #
+	#  APM_message function
 	#################################################
 	#TODO : create varibales like APM_LOG_LEVEL_INFO_PREFIX to configure output...
 	function(APM_message)
@@ -15,7 +15,7 @@ else()
 		elseif(l_APM_message_ERROR AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_ERROR))
 			message(SEND_ERROR "ERROR : " ${l_APM_message_UNPARSED_ARGUMENTS})
 		elseif(l_APM_message_FATAL)# For fatal errors, always print it...
-			message(FATAL_ERROR ${l_APM_message_UNPARSED_ARGUMENTS})
+			message(FATAL_ERROR "FATAL ERROR : " ${l_APM_message_UNPARSED_ARGUMENTS})
 		elseif(l_APM_message_INFO AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_INFO))
 			message(STATUS "INFO : " ${l_APM_message_UNPARSED_ARGUMENTS})
 		elseif(l_APM_message_TRACE AND (APM_LOG_LEVEL_ALL OR APM_LOG_LEVEL_TRACE))
@@ -26,10 +26,6 @@ else()
 			message(STATUS ${l_APM_message_UNPARSED_ARGUMENTS})
 		endif()
 	endfunction()
-
-	macro(APM_parentScope a_APM_Variable)
-		set(${a_APM_Variable} ${${a_APM_Variable}} PARENT_SCOPE)
-	endmacro()
 
 	function(APM_defaultSet a_APM_Variable)
 		if(NOT DEFINED ${a_APM_Variable})

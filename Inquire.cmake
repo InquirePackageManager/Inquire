@@ -16,11 +16,11 @@ if(INQUIRE_INCLUDE_GUARD)
 else(INQUIRE_INCLUDE_GUARD)
 	set(INQUIRE_INCLUDE_GUARD ON)
 
-	include(${CMAKE_CURRENT_LIST_DIR}/inquire_repository.cmake)
-	include(${CMAKE_CURRENT_LIST_DIR}/inquire_utils.cmake)
-	include(${CMAKE_CURRENT_LIST_DIR}/inquire_system_utils.cmake)
-	include(${CMAKE_CURRENT_LIST_DIR}/inquire_compiler_utils.cmake)
-	include(${CMAKE_CURRENT_LIST_DIR}/inquire_module_utils.cmake)
+	include(${CMAKE_CURRENT_LIST_DIR}/Inquire_repository.cmake)
+	include(${CMAKE_CURRENT_LIST_DIR}/Inquire_utils.cmake)
+	include(${CMAKE_CURRENT_LIST_DIR}/Inquire_system_utils.cmake)
+	include(${CMAKE_CURRENT_LIST_DIR}/Inquire_compiler_utils.cmake)
+	include(${CMAKE_CURRENT_LIST_DIR}/Inquire_module_utils.cmake)
 
 	##########################################################################################################
 	#                                             User functions                                             #

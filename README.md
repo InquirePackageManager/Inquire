@@ -32,6 +32,6 @@ The documentation is nonexistent. If you want to know how it works, I think the 
 
 Here is the current list of modules :
 
-- Boost :  [![Build Status](https://github.com/InquirePackageManager/Inquire_Boost.svg?branch=master)](https://travis-ci.org/InquirePackageManager/Inquire_Boost)
+- Boost :  [![Build Status](https://travis-ci.org/InquirePackageManager/Inquire_Boost.svg?branch=master)](https://travis-ci.org/InquirePackageManager/Inquire_Boost)
 - Eigen3 :  [![Build Status](https://travis-ci.org/InquirePackageManager/Inquire_Eigen3.svg?branch=master)](https://travis-ci.org/InquirePackageManager/Inquire_Eigen3)
 - FileInformation :  [![Build Status](https://travis-ci.org/InquirePackageManager/Inquire_FileInformation.svg?branch=master)](https://travis-ci.org/InquirePackageManager/Inquire_FileInformation)

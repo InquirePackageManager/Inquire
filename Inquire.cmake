@@ -1,13 +1,3 @@
-
-	#! \brief Brief description.
-	#!         Brief description continued.
-	#!
-	#!  Detailed description starts here.
-	#!
-	function(testfunc)
-	endfunction()
-
-
 include(CMakeParseArguments)
 include(ExternalProject)
 
@@ -137,12 +127,15 @@ else(INQUIRE_INCLUDE_GUARD)
 		inquire_message(INFO "Requiring module IPM_${a_IPM_projectName}...")
 
 		# Each l_IPM_repo contains the name of a repository variable
-		set(${a_IPM_projectName}_FOUND FALSE PARENT_SCOPE)
+		set(${a_IPM_projectName}_FOUND FALSE)
 		foreach(l_IPM_repo ${IPM_module_repositories})
+			unset(l_IPM_module_path)
 			IPM_require_module(${l_IPM_repo} ${a_IPM_projectName} l_IPM_module_path)
 			if(DEFINED l_IPM_module_path)
-				set(${a_IPM_projectName}_FOUND TRUE PARENT_SCOPE)
-				break()
+				if(NOT "${l_IPM_module_path}" STREQUAL "")
+					set(${a_IPM_projectName}_FOUND TRUE)
+					break()
+				endif()
 			endif()
 		endforeach(l_IPM_repo)
 
@@ -155,6 +148,7 @@ else(INQUIRE_INCLUDE_GUARD)
 			else()
 				inquire_message(INFO "Requiring module IPM_${a_IPM_projectName}... NOT FOUND")
 			endif()
+
 			return()
 		endif()
 
@@ -310,9 +304,9 @@ else(INQUIRE_INCLUDE_GUARD)
 
 	# IPM configuration folder
 	if(WIN32 OR CYGWIN)
-		set(IPM_DATA_DIRECTORY $ENV{USERPROFILE}/.IPM)
+		set(IPM_DATA_DIRECTORY $ENV{USERPROFILE}/.inquire)
 	else()
-		set(IPM_DATA_DIRECTORY $ENV{HOME}/.IPM)
+		set(IPM_DATA_DIRECTORY $ENV{HOME}/.inquire)
 	endif()
 
 	if(EXISTS ${IPM_DATA_DIRECTORY})

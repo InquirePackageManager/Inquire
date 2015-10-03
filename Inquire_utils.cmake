@@ -22,8 +22,6 @@ else()
 			message(STATUS "TRACE : " ${l_inquire_message_UNPARSED_ARGUMENTS})
 		elseif(l_inquire_message_WARN AND (IPM_LOG_LEVEL_ALL OR IPM_LOG_LEVEL_WARN))
 			message(WARNING "WARN : " ${l_inquire_message_UNPARSED_ARGUMENTS})
-		else()
-			message(STATUS ${l_inquire_message_UNPARSED_ARGUMENTS})
 		endif()
 	endfunction()
 

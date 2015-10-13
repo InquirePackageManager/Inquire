@@ -233,7 +233,7 @@ else(INQUIRE_INCLUDE_GUARD)
 
 			#NOTE : The use of a function here is to ensure that we declare a new scope.
 			function(IPM_search_compatible_version)
-				set(IPM_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
+				set(${a_IPM_projectName}_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
 				include(${l_IPM_module_path}/search_compatible_version.cmake)
 				set(${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND ${${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND} PARENT_SCOPE)
 				set(${a_IPM_projectName}_VERSION_ROOT ${${a_IPM_projectName}_VERSION_ROOT} PARENT_SCOPE)

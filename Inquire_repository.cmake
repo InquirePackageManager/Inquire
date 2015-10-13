@@ -24,7 +24,7 @@ else()
 	#		  ${a_IPM_res}            Variable containing the result;
 	#		  ${${a_IPM_res}}         Result.
 	#         ------------------------------------------------------------------------------
-	function(IPM_Repository_create a_IPM_repoType a_IPM_repoLocation a_IPM_res)
+	function(IPM_create_repository a_IPM_repoType a_IPM_repoLocation a_IPM_res)
 		file(TO_CMAKE_PATH ${a_IPM_repoLocation} l_IPM_repo_location)
 		list(APPEND ${a_IPM_res} ${a_IPM_repoType} "${l_IPM_repo_location}")
 		set(${a_IPM_res} "${${a_IPM_res}}" PARENT_SCOPE)

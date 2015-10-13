@@ -15,7 +15,7 @@ else(INQUIRE_INCLUDE_GUARD)
 	#                                             User functions                                             #
 	##########################################################################################################
 
-	#! \brief Add a module repository.
+	#! \brief Add a module repository with name ${a_IPM_name}.
 	#!
 	#!  This function add a module repository of type ${a_IPM_type} and at location ${a_IPM_address}. The variable pointing to the repository is stored in ${a_IPM_name} and appended to the global module repository list ${IPM_module_repositories}.
 	#!
@@ -29,14 +29,14 @@ else(INQUIRE_INCLUDE_GUARD)
 
 		#check if the repository already exists
 		if(DEFINED ${a_IPM_name})
-			inquire_message(SEND_ERROR "Repository ${${a_IPM_name}} already exists. It will be overriden.")
+			inquire_message(WARNING "Repository ${${a_IPM_name}} already exists. It will be overriden.")
 		endif()
 
 		#handle backslashes
 		string(REPLACE "\\" "/" a_IPM_address ${a_IPM_address})
 
 		#create repository
-		IPM_Repository_create(${a_IPM_type} ${a_IPM_address} ${a_IPM_name})
+		IPM_create_repository(${a_IPM_type} ${a_IPM_address} ${a_IPM_name})
 		#declare repository in parent scope
 		set(${a_IPM_name} ${${a_IPM_name}} PARENT_SCOPE)
 
@@ -48,7 +48,7 @@ else(INQUIRE_INCLUDE_GUARD)
 
 	#! \brief Add a package repository.
 	#!
-	#!  This function add a package repository of type ${a_IPM_type} and at location ${a_IPM_address}. The variable pointing to the repository is stored in ${a_IPM_name} and appended to the global package repository list ${IPM_package_repositories}.
+	#!  This function adds a package repository of type ${a_IPM_type} and at location ${a_IPM_address}. The variable pointing to the repository is stored in ${a_IPM_name} and appended to the global package repository list ${IPM_package_repositories}.
 	#!
 	function(inquire_add_package_repository a_IPM_name a_IPM_type a_IPM_address)
 		inquire_message(DEBUG "Creating package repository ${a_IPM_name} of type ${a_IPM_type} and address ${a_IPM_address}.")
@@ -59,14 +59,14 @@ else(INQUIRE_INCLUDE_GUARD)
 
 		#check if the repository already exists
 		if(DEFINED ${a_IPM_name})
-			inquire_message(SEND_ERROR "Repository ${${a_IPM_name}} already exists. It will be overriden.")
+			inquire_message(WARNING "Repository ${${a_IPM_name}} already exists. It will be overriden.")
 		endif()
 
 		#handle backslashes
 		string(REPLACE "\\" "/" a_IPM_address ${a_IPM_address})
 
 		#create repository
-		IPM_Repository_create(${a_IPM_type} ${a_IPM_address} ${a_IPM_name})
+		IPM_create_repository(${a_IPM_type} ${a_IPM_address} ${a_IPM_name})
 		#declare repository in parent scope
 		set(${a_IPM_name} ${${a_IPM_name}} PARENT_SCOPE)
 
@@ -128,7 +128,7 @@ else(INQUIRE_INCLUDE_GUARD)
 		#
 		# 1 - search for module
 		#
-		inquire_message(INFO "Requiring module IPM_${a_IPM_projectName}...")
+		inquire_message(INFO "Requiring module ${a_IPM_projectName}...")
 
 		# Each l_IPM_repo contains the name of a repository variable
 		set(${a_IPM_projectName}_FOUND FALSE)
@@ -147,16 +147,16 @@ else(INQUIRE_INCLUDE_GUARD)
 		if(NOT ${${a_IPM_projectName}_FOUND})
 			set(IPM_${a_IPM_projectName}_FOUND FALSE PARENT_SCOPE)
 			if(${l_IPM_require_package_REQUIRED})
-				inquire_message(ERROR "Requiring module IPM_${a_IPM_projectName}... NOT FOUND")
-				inquire_message(FATAL "Unable to find the required module IPM_${a_IPM_projectName}. Aborting.")
+				inquire_message(ERROR "Requiring module ${a_IPM_projectName}... NOT FOUND")
+				inquire_message(FATAL "Unable to find the required module ${a_IPM_projectName}. Aborting.")
 			else()
-				inquire_message(INFO "Requiring module IPM_${a_IPM_projectName}... NOT FOUND")
+				inquire_message(INFO "Requiring module ${a_IPM_projectName}... NOT FOUND")
 			endif()
 
 			return()
 		endif()
 
-		inquire_message(INFO "Requiring module IPM_${a_IPM_projectName}... FOUND")
+		inquire_message(INFO "Requiring module ${a_IPM_projectName}... FOUND")
 		set(${a_IPM_projectName}_FOUND TRUE PARENT_SCOPE)
 
 
@@ -188,9 +188,9 @@ else(INQUIRE_INCLUDE_GUARD)
 
 		if(NOT ${${a_IPM_projectName}_COMPATIBLE})
 			if(${l_IPM_require_package_REQUIRED})
-				inquire_message(FATAL "Module IPM_${a_IPM_projectName} is not compatible with the current configuration : \n ${${a_IPM_projectName}_COMPATIBILITY_DETAILS}\n")
+				inquire_message(FATAL "Module ${a_IPM_projectName} is not compatible with the current configuration : \n ${${a_IPM_projectName}_COMPATIBILITY_DETAILS}\n")
 			else()
-				inquire_message(INFO "Module IPM_${a_IPM_projectName} is not compatible with the current configuration : \n ${${a_IPM_projectName}_COMPATIBILITY_DETAILS}\n")
+				inquire_message(INFO "Module ${a_IPM_projectName} is not compatible with the current configuration : \n ${${a_IPM_projectName}_COMPATIBILITY_DETAILS}\n")
 			endif()
 		endif()
 
@@ -277,10 +277,10 @@ else(INQUIRE_INCLUDE_GUARD)
 				set(${a_IPM_projectName}_INSTALLATION_DIR )
 				#NOTE : The use of a function here is to ensure that we declare a new scope.
 				function(IPM_download)
-					set(IPM_VERSION ${l_IPM_require_package_VERSION})
-					set(IPM_PACKAGE_ROOT ${${a_IPM_projectName}_REPOSITORY_DIR})
+					set(${a_IPM_projectName}_VERSION ${l_IPM_require_package_VERSION})
+					set(${a_IPM_projectName}_PACKAGE_ROOT ${${a_IPM_projectName}_REPOSITORY_DIR})
 					include(${l_IPM_module_path}/download.cmake)
-					set(l_IPM_package_version_root ${IPM_PACKAGE_VERSION_ROOT} PARENT_SCOPE)
+					set(l_IPM_package_version_root ${${a_IPM_projectName}_PACKAGE_VERSION_ROOT} PARENT_SCOPE)
 				endfunction()
 				IPM_download()
 				set(l_IPM_need_install FALSE)
@@ -293,9 +293,11 @@ else(INQUIRE_INCLUDE_GUARD)
 		if(NOT ${l_IPM_need_install})
 			#NOTE : The use of a function here is to ensure that we declare a new scope.
 			function(IPM_compile)
-				set(IPM_PACKAGE_VERSION_ROOT ${l_IPM_package_version_root})
-				set(IPM_COMPONENTS ${l_IPM_require_package_COMPONENTS})
-				include(${l_IPM_module_path}/compile.cmake)
+				set(${a_IPM_projectName}_PACKAGE_VERSION_ROOT ${l_IPM_package_version_root})
+				set(${a_IPM_projectName}_COMPONENTS ${l_IPM_require_package_COMPONENTS})
+				if(EXISTS ${l_IPM_module_path}/compile.cmake)
+					include(${l_IPM_module_path}/compile.cmake)
+				endif()
 			endfunction()
 			IPM_compile()
 		endif()
@@ -304,21 +306,24 @@ else(INQUIRE_INCLUDE_GUARD)
 		#
 		# 3.5 - if no compatible installed version is found and user did not ask to install package, send error if package is required, or display a status message otherwise.
 		#
-		if(${l_IPM_need_install} AND NOT ${INSTALL_${a_IPM_projectName}})
-			set(l_IPM_msg  "No compatible installed version of ${a_IPM_projectName} found. Set INSTALL_${a_IPM_projectName} to TRUE if you want top install the package, or set ${a_IPM_projectName}_INSTALLATION_DIR to the path of a compatible installed version.")
-			if(${l_IPM_require_package_REQUIRED})
-				inquire_message(ERROR ${l_IPM_msg})
-			else()
-				inquire_message(INFO ${l_IPM_msg})
+		if(${l_IPM_need_install})
+			if(NOT ${INSTALL_${a_IPM_projectName}})
+				set(l_IPM_msg  "No compatible installed version of ${a_IPM_projectName} found. Set INSTALL_${a_IPM_projectName} to TRUE if you want top install the package, or set ${a_IPM_projectName}_INSTALLATION_DIR to the path of a compatible installed version.")
+				if(${l_IPM_require_package_REQUIRED})
+					inquire_message(ERROR ${l_IPM_msg})
+				else()
+					inquire_message(INFO ${l_IPM_msg})
+				endif()
 			endif()
 		endif()
 
 		#NOTE : The use of a function here is to ensure that we declare a new scope.
 		function(IPM_configure)
-			set(IPM_PACKAGE_VERSION_ROOT ${l_IPM_package_version_root})
-			set(IPM_COMPONENTS ${l_IPM_require_package_COMPONENTS})
-			set(IPM_TARGETS ${l_IPM_require_package_TARGETS})
+			set(${a_IPM_projectName}_PACKAGE_VERSION_ROOT ${l_IPM_package_version_root})
+			set(${a_IPM_projectName}_COMPONENTS ${l_IPM_require_package_COMPONENTS})
+			set(${a_IPM_projectName}_TARGETS ${l_IPM_require_package_TARGETS})
 			include(${l_IPM_module_path}/configure.cmake)
+			set(${a_IPM_projectName}_FILES_TO_INCLUDE "${${a_IPM_projectName}_FILES_TO_INCLUDE}" PARENT_SCOPE)
 		endfunction()
 		IPM_configure()
 		set(${l_IPM_require_package_FILES_TO_INCLUDE} "${${a_IPM_projectName}_FILES_TO_INCLUDE}" PARENT_SCOPE)

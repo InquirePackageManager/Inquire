@@ -268,6 +268,7 @@ else(INQUIRE_INCLUDE_GUARD)
 		set(${a_IPM_projectName}_REPOSITORY_DIR "${l_IPM_repo_location}/${a_IPM_projectName}")
 
 
+		set(${a_IPM_projectName}_PACKAGE_VERSION_ROOT )
 		if(${l_IPM_need_install})
 			#
 			# 3.3 - if no compatible installed version is found, ask user if we need to install the package

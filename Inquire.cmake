@@ -90,6 +90,86 @@ else(INQUIRE_INCLUDE_GUARD)
 		endif()
 	endmacro()
 
+	#! \brief check a module compatibility.
+	#!
+	#!  This function checks that the module ${a_IPM_module_name} located in ${a_IPM_module_path} is compatible with the current compiler, and the version of CMake.
+	#!
+	function(IPM_check_module_compatibility a_IPM_module_path a_IPM_module_name a_IPM_is_compatible a_IPM_details)
+		set(${a_IPM_is_compatible} TRUE PARENT_SCOPE)
+		set(${a_IPM_details} "" PARENT_SCOPE)
+		if(EXISTS ${a_IPM_module_path}/compatibility.cmake)
+			inquire_message(DEBUG "Including ${a_IPM_module_path}/compatibility.cmake")
+			include(${a_IPM_module_path}/compatibility.cmake)
+			set(${a_IPM_is_compatible} ${${a_IPM_module_name}_COMPATIBLE} PARENT_SCOPE)
+			set(${a_IPM_details} ${${a_IPM_module_name}_COMPATIBILITY_DETAILS} PARENT_SCOPE)
+		else()
+			inquire_message(DEBUG "${a_IPM_module_path}/compatibility.cmake does not exist.")
+		endif()
+	endfunction()
+
+	function(IPM_configure_targets a_IPM_module_path a_IPM_project_name a_IMP_version_root)
+		cmake_parse_arguments(l_IPM_configure_targets "" "" "COMPONENTS;TARGETS;FILES_TO_INCLUDE" ${ARGN})
+
+		set(${a_IPM_project_name}_PACKAGE_VERSION_ROOT ${a_IMP_version_root})
+		set(${a_IPM_project_name}_COMPONENTS ${l_IPM_configure_targets_COMPONENTS})
+		set(${a_IPM_project_name}_TARGETS ${l_IPM_configure_targets_TARGETS})
+		include(${a_IPM_module_path}/configure.cmake)
+		set(${l_IPM_configure_targets_FILES_TO_INCLUDE} ${${a_IPM_project_name}_FILES_TO_INCLUDE} PARENT_SCOPE)
+	endfunction()
+
+
+
+			#
+			# 3.b - try to find a suitable installed version of the project in the defined repositories
+			#
+	function(IPM_search_compatible_package_version a_IPM_module_path a_IPM_projectName a_IPM_package_repository a_IPM_package_version_root a_IPM_need_install)
+		cmake_parse_arguments(l_IPM_find_package "" "VERSION" "REPOSITORIES" ${ARGN})
+
+		if(NOT DEFINED l_IPM_find_package_REPOSITORIES)
+			inquire_message(FATAL "The REPOSITORIES parameter is mandatory.")
+		endif()
+
+		foreach(l_IPM_repo ${l_IPM_find_package_REPOSITORIES})
+			IPM_Repository_getLocation(${l_IPM_repo} l_IPM_repo_location)
+			inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}...")
+
+			#first, check if there is a ${a_IPM_projectName} folder
+			if(NOT EXISTS ${l_IPM_repo_location}/${a_IPM_projectName})
+				inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... NOT FOUND")
+				set(${a_IPM_need_install} TRUE)
+				continue()
+			endif()
+
+			# then check if a compatible version of the package is available
+			set(IPM_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
+			set(${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND FALSE)
+			set(${a_IPM_projectName}_VERSION_ROOT )
+
+			#NOTE : The use of a function here is to ensure that we declare a new scope.
+			function(IPM_search_compatible_version)
+				set(${a_IPM_projectName}_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
+				include(${a_IPM_module_path}/search_compatible_version.cmake)
+				set(${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND ${${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND} PARENT_SCOPE)
+				set(${a_IPM_projectName}_VERSION_ROOT ${${a_IPM_projectName}_VERSION_ROOT} PARENT_SCOPE)
+			endfunction()
+			IPM_search_compatible_version()
+
+			if(${${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND})
+				# we found our version. Break the loop and save the repository.
+				set(${a_IPM_package_repository} ${l_IPM_repo} PARENT_SCOPE)
+				inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... FOUND")
+				set(${a_IPM_package_version_root} ${${a_IPM_projectName}_VERSION_ROOT} PARENT_SCOPE)
+				break()
+			else()
+				#otherwise, go to the next iteration. Set a_IPM_need_install to TRUE in case this is the last iteration.
+				inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... NOT FOUND")
+				set(${a_IPM_need_install} TRUE)
+				continue()
+			endif()
+		endforeach(l_IPM_repo)
+	endfunction()
+
+
 	function(IPM_require_package a_IPM_projectName)
 		##################################################################
 		#                       Managing arguments                       #
@@ -126,8 +206,10 @@ else(INQUIRE_INCLUDE_GUARD)
 		#                     Function implementation                     #
 		###################################################################
 		#
-		# 1 - search for module
-		#
+		###############################
+		#             -1-             #
+		#      Search for module      #
+		###############################
 		inquire_message(INFO "Requiring module ${a_IPM_projectName}...")
 
 		# Each l_IPM_repo contains the name of a repository variable
@@ -159,32 +241,13 @@ else(INQUIRE_INCLUDE_GUARD)
 		inquire_message(INFO "Requiring module ${a_IPM_projectName}... FOUND")
 		set(${a_IPM_projectName}_FOUND TRUE PARENT_SCOPE)
 
-
-		#
-		# 2 - check package compatibility
-		#
-		# TODO : Check that required scripts are given
-		#
-		# Set default values :
-		#
-
+		###############################
+		#             -2-             #
+		# Check package compatibility #
+		###############################
 		set(${a_IPM_projectName}_COMPATIBLE TRUE)
 		set(${a_IPM_projectName}_COMPATIBILITY_DETAILS "")
-		if(EXISTS ${l_IPM_module_path}/compatibility.cmake)
-			inquire_message(DEBUG "Including ${l_IPM_module_path}/compatibility.cmake")
-
-			#NOTE : The use of a function here is to ensure that we declare a new scope.
-			function(IPM_check_module_compatibility)
-				include(${l_IPM_module_path}/compatibility.cmake)
-				set(${a_IPM_projectName}_COMPATIBLE ${${a_IPM_projectName}_COMPATIBLE} PARENT_SCOPE)
-				set(${a_IPM_projectName}_COMPATIBILITY_DETAILS ${${a_IPM_projectName}_COMPATIBILITY_DETAILS} PARENT_SCOPE)
-			endfunction()
-
-			IPM_check_module_compatibility(${l_IPM_module_path})
-
-		else()
-			inquire_message(DEBUG "${l_IPM_module_path}/compatibility.cmake does not exist.")
-		endif()
+		IPM_check_module_compatibility(${l_IPM_module_path} ${a_IPM_projectName} ${a_IPM_projectName}_COMPATIBLE ${a_IPM_projectName}_COMPATIBILITY_DETAILS)
 
 		if(NOT ${${a_IPM_projectName}_COMPATIBLE})
 			if(${l_IPM_require_package_REQUIRED})
@@ -200,59 +263,56 @@ else(INQUIRE_INCLUDE_GUARD)
 		if(DEFINED ${a_IPM_projectName}_INSTALLATION_DIR)
 			inquire_message(INFO "Using provided path as package root : ${${a_IPM_projectName}_INSTALLATION_DIR}")
 			set(${a_IPM_projectName}_FILES_TO_INCLUDE )
-			#NOTE : The use of a function here is to ensure that we declare a new scope.
-			function(IPM_configure_targets)
-				set(IPM_PACKAGE_VERSION_ROOT ${${a_IPM_projectName}_INSTALLATION_DIR})
-				set(IPM_COMPONENTS ${l_IPM_require_package_COMPONENTS})
-				set(IPM_TARGETS ${l_IPM_require_package_TARGETS})
-				include(${l_IPM_module_path}/configure.cmake)
-				set(${a_IPM_projectName}_FILES_TO_INCLUDE ${${a_IPM_projectName}_FILES_TO_INCLUDE} PARENT_SCOPE)
-			endfunction()
-			IPM_configure_targets()
+
+			IPM_configure_targets(${l_IPM_module_path} ${a_IPM_projectName} ${${a_IPM_projectName}_INSTALLATION_DIR} COMPONENTS ${l_IPM_require_package_COMPONENTS} TARGETS ${l_IPM_require_package_TARGETS} FILES_TO_INCLUDE ${a_IPM_projectName}_FILES_TO_INCLUDE)
+
 			return()
 		endif()
-
 		#
-		# 3.b - try to find a suitable installed version of the project in the defined repositories
+		# #
+		# # 3.b - try to find a suitable installed version of the project in the defined repositories
+		# #
+		# foreach(l_IPM_repo ${l_IPM_package_repositories})
+		# 	IPM_Repository_getLocation(${l_IPM_repo} l_IPM_repo_location)
+		# 	inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}...")
 		#
-		foreach(l_IPM_repo ${l_IPM_package_repositories})
-			IPM_Repository_getLocation(${l_IPM_repo} l_IPM_repo_location)
-			inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}...")
-
-			#first, check if there is a ${a_IPM_projectName} folder
-			if(NOT EXISTS ${l_IPM_repo_location}/${a_IPM_projectName})
-				inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... NOT FOUND")
-				set(l_IPM_need_install TRUE)
-				continue()
-			endif()
-
-			# then check if a compatible version of the package is available
-			set(IPM_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
-			set(${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND FALSE)
-			set(${a_IPM_projectName}_VERSION_ROOT )
-
-			#NOTE : The use of a function here is to ensure that we declare a new scope.
-			function(IPM_search_compatible_version)
-				set(${a_IPM_projectName}_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
-				include(${l_IPM_module_path}/search_compatible_version.cmake)
-				set(${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND ${${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND} PARENT_SCOPE)
-				set(${a_IPM_projectName}_VERSION_ROOT ${${a_IPM_projectName}_VERSION_ROOT} PARENT_SCOPE)
-			endfunction()
-			IPM_search_compatible_version()
-
-			if(${${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND})
-				# we found our version. Break the loop and save the repository.
-				set(l_IPM_package_repository ${l_IPM_repo})
-				inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... FOUND")
-				set(l_IPM_package_version_root ${${a_IPM_projectName}_VERSION_ROOT})
-				break()
-			else()
-				#otherwise, go to the next iteration. Set l_IPM_need_install to TRUE in case this is the last iteration.
-				inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... NOT FOUND")
-				set(l_IPM_need_install TRUE)
-				continue()
-			endif()
-		endforeach(l_IPM_repo)
+		# 	#first, check if there is a ${a_IPM_projectName} folder
+		# 	if(NOT EXISTS ${l_IPM_repo_location}/${a_IPM_projectName})
+		# 		inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... NOT FOUND")
+		# 		set(l_IPM_need_install TRUE)
+		# 		continue()
+		# 	endif()
+		#
+		# 	# then check if a compatible version of the package is available
+		# 	set(IPM_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
+		# 	set(${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND FALSE)
+		# 	set(${a_IPM_projectName}_VERSION_ROOT )
+		#
+		# 	#NOTE : The use of a function here is to ensure that we declare a new scope.
+		# 	function(IPM_search_compatible_version)
+		# 		set(${a_IPM_projectName}_PACKAGE_ROOT "${l_IPM_repo_location}/${a_IPM_projectName}")
+		# 		include(${l_IPM_module_path}/search_compatible_version.cmake)
+		# 		set(${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND ${${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND} PARENT_SCOPE)
+		# 		set(${a_IPM_projectName}_VERSION_ROOT ${${a_IPM_projectName}_VERSION_ROOT} PARENT_SCOPE)
+		# 	endfunction()
+		# 	IPM_search_compatible_version()
+		#
+		# 	if(${${a_IPM_projectName}_COMPATIBLE_VERSION_FOUND})
+		# 		# we found our version. Break the loop and save the repository.
+		# 		set(l_IPM_package_repository ${l_IPM_repo})
+		# 		inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... FOUND")
+		# 		set(l_IPM_package_version_root ${${a_IPM_projectName}_VERSION_ROOT})
+		# 		break()
+		# 	else()
+		# 		#otherwise, go to the next iteration. Set l_IPM_need_install to TRUE in case this is the last iteration.
+		# 		inquire_message(INFO "Searching for installation of project ${a_IPM_projectName} in repository ${l_IPM_repo_location}... NOT FOUND")
+		# 		set(l_IPM_need_install TRUE)
+		# 		continue()
+		# 	endif()
+		# endforeach(l_IPM_repo)
+		
+		IPM_search_compatible_package_version(${l_IPM_module_path} ${a_IPM_projectName} l_IPM_package_repository l_IPM_package_version_root l_IPM_need_install 
+			REPOSITORIES ${l_IPM_package_repositories})
 
 		# if no valid repository was found, use the repository given as parameter or the default one
 		if(NOT DEFINED l_IPM_package_repository)
@@ -318,15 +378,7 @@ else(INQUIRE_INCLUDE_GUARD)
 			endif()
 		endif()
 
-		#NOTE : The use of a function here is to ensure that we declare a new scope.
-		function(IPM_configure)
-			set(${a_IPM_projectName}_PACKAGE_VERSION_ROOT ${l_IPM_package_version_root})
-			set(${a_IPM_projectName}_COMPONENTS ${l_IPM_require_package_COMPONENTS})
-			set(${a_IPM_projectName}_TARGETS ${l_IPM_require_package_TARGETS})
-			include(${l_IPM_module_path}/configure.cmake)
-			set(${a_IPM_projectName}_FILES_TO_INCLUDE "${${a_IPM_projectName}_FILES_TO_INCLUDE}" PARENT_SCOPE)
-		endfunction()
-		IPM_configure()
+		IPM_configure_targets(${l_IPM_module_path} ${a_IPM_projectName} ${l_IPM_package_version_root} COMPONENTS ${l_IPM_require_package_COMPONENTS} TARGETS ${l_IPM_require_package_TARGETS} FILES_TO_INCLUDE ${a_IPM_projectName}_FILES_TO_INCLUDE)
 		set(${l_IPM_require_package_FILES_TO_INCLUDE} "${${a_IPM_projectName}_FILES_TO_INCLUDE}" PARENT_SCOPE)
 	endfunction()
 
